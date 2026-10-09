@@ -15,18 +15,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare artifacts (.exe files)
-        run: |
-          mkdir -p dist
-          # Alle .exe-Dateien im Repo suchen (ohne dist selbst) und nach dist kopieren
-          find . -type f -name "*.exe" ! -path "./dist/*" -exec cp {} dist/ \;
+      - name: Validate and stage the five root artifacts
+        run: python3 artifacts.py stage-release --output-dir dist
 
-      - name: Create GitHub Release with all exe assets
+      - name: Create GitHub Release with reviewed artifacts and manifest
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
           tag_name: build-${{ github.run_number }}
           name: "Build ${{ github.run_number }}"
-          files: dist/*.exe
+          files: |
+            dist/SpitewareLoader.exe
+            dist/SpitewareLoader_Debug.exe
+            dist/cs2_kernel_pro.exe
+            dist/cs2_kernel_esp.exe
+            dist/cs2_kernel_obsidian.exe
+            dist/manifest.json
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

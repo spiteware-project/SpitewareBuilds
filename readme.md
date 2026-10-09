@@ -36,30 +36,47 @@ All five names were present in release metadata. GET requests with `Range: 0-1` 
 
 ## Refresh and release process
 
-[refresh_builds.bat](refresh_builds.bat), lines 7–20, copies the five sources above into **this repository's root only**. It does not update `mods/` executables or `Data/` snapshots. Missing sources and copy failures stop the script, but earlier copies may already have changed. Each target is deleted before its replacement is copied.
+**Repaired and checked: 09.10.2026.** [artifacts.py](artifacts.py) is the validator and staging helper. The five root and three `mods/` executables were preserved. Tests used synthetic PE files and local temporary Git repositories; no real refresh or publication occurred.
 
-**Refreshing alone is currently insufficient to prepare a reliable release.** The workflow's recursive search on line 22 copies every `.exe` outside `dist/` into one flat directory. Root and `mods/` executables share basenames, so the copy encountered last overwrites the other. Refreshing the root leaves old `mods/` binaries eligible for publication.
+[refresh_builds.bat](refresh_builds.bat) previews all five sibling sources by default. Explicit apply updates this repository's **root only**, leaving `mods/` and `Data/` snapshots untouched:
 
-Before the next publication:
+```powershell
+.\refresh_builds.bat --dry-run --manifest "$env:TEMP\spiteware-refresh.json"
+# After independent review of artifacts and source validation:
+.\refresh_builds.bat --apply --approved-manifest "$env:TEMP\spiteware-refresh.json"
+```
 
-1. Resolve duplicate selection, preferably with an explicit workflow allowlist of the four root production executables. Decide explicitly whether to distribute the debug loader.
-2. Check all sources before replacing targets, then compare intended artifacts by full SHA256. Maintain or remove duplicates consistently with the chosen layout.
-3. Review the diff, binary versions, download URLs, and KeyAuth variable names together. Under the checked workflow, any push to `main` is a publication trigger.
-4. After an authorized publication, inspect that job and its assets, compare digests, and test the actual loader flow.
+All five sources must exist and pass x64 PE32+ header, section/resource-bound checks before the first target write. The manifest records lowercase SHA256, size, nullable PE `file_version`, source path relative to `cs2/`, and previous target digest. Missing version resources produce `null`; no KeyAuth version is inferred. Changed sources or destinations invalidate the approval manifest.
 
-These are pending changes and checks, not fixes implemented by this README update.
+All replacements are staged on the target filesystem, then replaced atomically per file. Handled failures roll back prior replacements; recovery files and a named `transaction.json` mapping remain in `.stage-*/` if rollback fails. This is not a crash-atomic multi-file transaction. Hashes establish identity, not source freshness or runtime compatibility.
+
+Before repair, refresh deleted targets first and could leave a partial update. The dated original audit also found recursive flattening of stale `mods/` copies onto matching root basenames. The helper and current workflow address those findings.
 
 ### GitHub Actions
 
-The checked [workflow](.github/workflows/release-on-main.yml) declares a `push` trigger for `main`, checks out this artifact repository, prepares the recursive collection above, and invokes `softprops/action-gh-release@v2`. It grants `contents: write` to the job. The intended tag is `build-${{ github.run_number }}` and assets are `dist/*.exe`. It does not compile sources, check artifact freshness, or update KeyAuth variables.
+The [workflow](.github/workflows/release-on-main.yml) still publishes on pushes to `main`. `python3 artifacts.py stage-release --output-dir dist` selects exactly the five root artifacts, including the already distributed debug loader. Other root executables and `mods/` are excluded.
 
-`build-<N>` is a workflow run identifier, separate from executable versions and KeyAuth `*_version` values. A documentation-only push can publish the same binaries under a new tag. Future job success and external settings require fresh verification.
+All five pass PE checks before staging. Explicit asset paths and `fail_on_unmatched_files: true` prevent silent omissions. The release includes five executables plus `manifest.json`: `schema_version: 1`, `purpose: "release"`, and `artifacts` entries with `name`, `size`, lowercase `sha256`, and nullable `file_version`.
 
-### Manual helper
+The job uses `softprops/action-gh-release@v2`, `contents: write`, and tag `build-${{ github.run_number }}`. It does not compile sources or update KeyAuth. `build-<N>` is separate from PE and KeyAuth versions. A documentation-only push can still publish unchanged binaries. The repaired workflow was checked locally; no new GitHub run is claimed.
 
-[auto_commit.bat](auto_commit.bat) runs `git add .`, `git commit`, and `git push`; it is a publishing helper, not a build or validation command. Its European date parsing swaps day and month, as historical commit messages show. It lacks error checks between the Git commands and stages all changes in this artifact repository. Review the working tree before using it; it was not run during this audit.
+### Manual publishing helper
 
-`SpitewareLoader_Debug.exe` is already tracked and was included in build-77. The matching [.gitignore](.gitignore) entry does not remove a tracked artifact or exclude it from the workflow.
+[auto_commit.bat](auto_commit.bat) is now a preview by default:
+
+```powershell
+.\auto_commit.bat --manifest "$env:TEMP\spiteware-publish.json"
+# Only after installed artifact/release review:
+.\auto_commit.bat --publish --approved-manifest "$env:TEMP\spiteware-publish.json"
+```
+
+Publication requires `main` with a remote `main` upstream, no pre-existing staged changes, no unrelated working-tree changes, and no unpublished local commits. Git synchronization must succeed before staging; artifacts must still match the approval afterward. Only the five filenames are staged/committed. UTC ISO timestamps avoid Windows locale ambiguity. Git exit statuses and remote HEAD are checked; identical artifacts cause no commit/push. Git confirmation does not prove release-job success or CDN contents.
+
+The debug loader remains tracked and deliberately distributed; [.gitignore](.gitignore) does not untrack it. Root [SpitewareSetup.bat](../../SpitewareSetup.bat) now uses the canonical `spiteware-project/SpitewareBuilds/releases/latest/download/SpitewareLoader.exe` URL. Downloads are staged beside the target, PE-validated, then replaced. Only its download fragment was tested with fake responses; full setup/system changes were not run.
+
+### Local verification
+
+From the workspace root: `py -3 -B -m unittest discover -s cs2/builds/tests -v`. Tests cover preview preservation, missing/invalid inputs, changed manifests, rollback, root-only release selection, offset Git order/dirty refusal/scoped publication, generation hashes, dummy Cargo, and setup downloads. Fixtures do not launch real executables or use network remotes.
 
 ## Loader and KeyAuth contract
 
@@ -80,7 +97,7 @@ Follow-up release comparison: all five assets in August's `build-77` have the sa
 
 ## Offset dependency
 
-All three kernel products fetch the website's `offsets.json`, `buttons.json`, `client_dll.json`, and `gamedata.json`. The [dumper README](../../tools/cs2-dumper/README.md) documents the current updater defects: copying before `git pull --rebase`, missing `info.json` → `gamedata.json` mapping, and incompatible client/server version fields. Neither refresh nor the release workflow updates these JSON files.
+All three kernel products fetch the website's `offsets.json`, `buttons.json`, `client_dll.json`, and `gamedata.json`. The [dumper README](../../tools/cs2-dumper/README.md) documents the repaired preview/apply/publish interface, Git synchronization before installation, and `info.json` → `gamedata.json` mapping with exact-byte SHA256 generation hashes. Running-game/build compatibility still requires client and runtime validation. Neither refresh nor the release workflow updates these JSON files.
 
 ## Related projects and documentation upkeep
 
