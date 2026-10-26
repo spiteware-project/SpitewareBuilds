@@ -1,4 +1,4 @@
-"""Validate and stage the five deliberately distributed artifacts; never execute them."""
+"""Validate and stage the four deliberately distributed artifacts; never execute them."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -11,9 +11,12 @@ import subprocess
 import sys
 import tempfile
 
+# The debug loader is deliberately absent: it is a local test tool only
+# (DEBUG_LOCAL, no server downloads) and is not distributed through releases
+# since 26.10.2026. It stays available untracked in the repository root for
+# the local test workflow.
 ARTIFACTS = {
     "SpitewareLoader.exe": "loader/build/release/SpitewareLoader.exe",
-    "SpitewareLoader_Debug.exe": "loader/build/debug/SpitewareLoader.exe",
     "cs2_kernel_pro.exe": "kernel-pro/build/Spiteware/cs2_kernel_pro.exe",
     "cs2_kernel_esp.exe": "kernel-esp/build/Spiteware/cs2_kernel_esp.exe",
     "cs2_kernel_obsidian.exe": "kernel-obsidian/build/Spiteware/cs2_kernel_obsidian.exe",
@@ -208,7 +211,7 @@ def git(directory, *args):
 
 
 def publish(directory, manifest):
-    """Explicit publication only; commit precisely the reviewed five artifacts."""
+    """Explicit publication only; commit precisely the reviewed four artifacts."""
     if git(directory, "branch", "--show-current") != "main":
         raise ValueError("publication requires the reviewed main branch")
     if git(directory, "diff", "--cached", "--name-only"):

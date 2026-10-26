@@ -1,6 +1,12 @@
 # Spiteware builds gitignore
+# The debug loader stays a local test tool: untracked since 26.10.2026 and not
+# part of published releases; rebuild it from cs2/loader when missing.
 SpitewareLoader_Debug.exe
 SpitewareLoader_Release.exe
+# Local game-test state: the loader writes configs, offset data and snapshots
+# here. Untracked so a test can run while a release is published.
+mods/
+__pycache__/
 /dist/
 *.log
 loader_debug_build.log

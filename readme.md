@@ -9,14 +9,24 @@ Release artifact store for [spiteware-project/SpitewareBuilds](https://github.co
 | Root artifact | Source relative to `cs2/` |
 |---|---|
 | `SpitewareLoader.exe` | `loader/build/release/SpitewareLoader.exe` |
-| `SpitewareLoader_Debug.exe` | `loader/build/debug/SpitewareLoader.exe` |
 | `cs2_kernel_pro.exe` | `kernel-pro/build/Spiteware/cs2_kernel_pro.exe` |
 | `cs2_kernel_esp.exe` | `kernel-esp/build/Spiteware/cs2_kernel_esp.exe` |
 | `cs2_kernel_obsidian.exe` | `kernel-obsidian/build/Spiteware/cs2_kernel_obsidian.exe` |
 
-There are **five root artifacts**, including the debug loader. `mods/` also contains flat copies of the three kernel executables. Each `mods/CS2 Kernel {Pro,ESP,Obsidian}/` directory contains `default.cfg` and `Data/{buttons,client_dll,gamedata,offsets}.json`; no executable was present inside those named directories at review time.
+There are **four root artifacts**. Changed 26.10.2026: the debug loader is no
+longer part of the release set. It is a local test tool (`DEBUG_LOCAL`, no
+server downloads, no self-update) that no KeyAuth link ever referenced; an
+untracked copy may remain in the repository root for the local
+[test workflow](AGENTS.md), and a fresh one is built from
+`cs2/loader/build/debug/` when needed.
 
-The [workflow](.github/workflows/release-on-main.yml) uploads executable files only. It does not package default configurations or `Data/` directories. Those snapshots differ from the website's offsets and need separate maintenance if retained for manual distribution.
+Changed the same day: everything under `mods/` is untracked local game-test
+state (flat kernel copies, `default.cfg`, `Data/*.json`, loader-generated
+`offsets-snapshot.json`), covered by [.gitignore](.gitignore). The loader writes
+those files at runtime, so tracking them made every game test dirty the tree
+and blocked publication; a test can now run while a release is published. The
+workflow uploads executable files only and packages no configurations or
+`Data/` directories.
 
 ## Dated release snapshot
 
@@ -36,9 +46,9 @@ All five names were present in release metadata. GET requests with `Range: 0-1` 
 
 ## Refresh and release process
 
-**Repaired and checked: 09.10.2026.** [artifacts.py](artifacts.py) is the validator and staging helper. The five root and three `mods/` executables were preserved. Tests used synthetic PE files and local temporary Git repositories; no real refresh or publication occurred.
+**Repaired and checked: 09.10.2026; artifact set reduced to four on 26.10.2026.** [artifacts.py](artifacts.py) is the validator and staging helper. The four root executables are preserved; the formerly tracked `mods/` copies and debug loader are untracked since 26.10.2026 and stay on disk as local test state. Tests used synthetic PE files and local temporary Git repositories; no real refresh or publication occurred.
 
-[refresh_builds.bat](refresh_builds.bat) previews all five sibling sources by default. Explicit apply updates this repository's **root only**, leaving `mods/` and `Data/` snapshots untouched:
+[refresh_builds.bat](refresh_builds.bat) previews all four sibling sources by default. Explicit apply updates this repository's **root only**, leaving `mods/` and `Data/` snapshots untouched:
 
 ```powershell
 .\refresh_builds.bat --dry-run --manifest "$env:TEMP\spiteware-refresh.json"
@@ -46,7 +56,7 @@ All five names were present in release metadata. GET requests with `Range: 0-1` 
 .\refresh_builds.bat --apply --approved-manifest "$env:TEMP\spiteware-refresh.json"
 ```
 
-All five sources must exist and pass x64 PE32+ header, section/resource-bound checks before the first target write. The manifest records lowercase SHA256, size, nullable PE `file_version`, source path relative to `cs2/`, and previous target digest. Missing version resources produce `null`; no KeyAuth version is inferred. Changed sources or destinations invalidate the approval manifest.
+All four sources must exist and pass x64 PE32+ header, section/resource-bound checks before the first target write. The manifest records lowercase SHA256, size, nullable PE `file_version`, source path relative to `cs2/`, and previous target digest. Missing version resources produce `null`; no KeyAuth version is inferred. Changed sources or destinations invalidate the approval manifest.
 
 All replacements are staged on the target filesystem, then replaced atomically per file. Handled failures roll back prior replacements; recovery files and a named `transaction.json` mapping remain in `.stage-*/` if rollback fails. This is not a crash-atomic multi-file transaction. Hashes establish identity, not source freshness or runtime compatibility.
 
@@ -54,9 +64,9 @@ Before repair, refresh deleted targets first and could leave a partial update. T
 
 ### GitHub Actions
 
-The [workflow](.github/workflows/release-on-main.yml) still publishes on pushes to `main`. `python3 artifacts.py stage-release --output-dir dist` selects exactly the five root artifacts, including the already distributed debug loader. Other root executables and `mods/` are excluded.
+The [workflow](.github/workflows/release-on-main.yml) still publishes on pushes to `main`. `python3 artifacts.py stage-release --output-dir dist` selects exactly the four root artifacts. The debug loader, other root executables and `mods/` are excluded.
 
-All five pass PE checks before staging. Explicit asset paths and `fail_on_unmatched_files: true` prevent silent omissions. The release includes five executables plus `manifest.json`: `schema_version: 1`, `purpose: "release"`, and `artifacts` entries with `name`, `size`, lowercase `sha256`, and nullable `file_version`.
+All four pass PE checks before staging. Explicit asset paths and `fail_on_unmatched_files: true` prevent silent omissions. The release includes four executables plus `manifest.json`: `schema_version: 1`, `purpose: "release"`, and `artifacts` entries with `name`, `size`, lowercase `sha256`, and nullable `file_version`.
 
 The job uses `softprops/action-gh-release@v2`, `contents: write`, and tag `build-${{ github.run_number }}`. It does not compile sources or update KeyAuth. `build-<N>` is separate from PE and KeyAuth versions. A documentation-only push can still publish unchanged binaries. The repaired workflow was checked locally; no new GitHub run is claimed.
 
@@ -70,9 +80,9 @@ The job uses `softprops/action-gh-release@v2`, `contents: write`, and tag `build
 .\auto_commit.bat --publish --approved-manifest "$env:TEMP\spiteware-publish.json"
 ```
 
-Publication requires `main` with a remote `main` upstream, no pre-existing staged changes, no unrelated working-tree changes, and no unpublished local commits. Git synchronization must succeed before staging; artifacts must still match the approval afterward. Only the five filenames are staged/committed. UTC ISO timestamps avoid Windows locale ambiguity. Git exit statuses and remote HEAD are checked; identical artifacts cause no commit/push. Git confirmation does not prove release-job success or CDN contents.
+Publication requires `main` with a remote `main` upstream, no pre-existing staged changes, no unrelated working-tree changes, and no unpublished local commits. Git synchronization must succeed before staging; artifacts must still match the approval afterward. Only the four filenames are staged/committed. UTC ISO timestamps avoid Windows locale ambiguity. Git exit statuses and remote HEAD are checked; identical artifacts cause no commit/push. Git confirmation does not prove release-job success or CDN contents.
 
-The debug loader remains tracked and deliberately distributed; [.gitignore](.gitignore) does not untrack it. Root [SpitewareSetup.bat](../../SpitewareSetup.bat) now uses the canonical `spiteware-project/SpitewareBuilds/releases/latest/download/SpitewareLoader.exe` URL. Downloads are staged beside the target, PE-validated, then replaced. Only its download fragment was tested with fake responses; full setup/system changes were not run.
+The debug loader is untracked since 26.10.2026 and no longer distributed; [.gitignore](.gitignore) keeps it and the whole `mods/` directory out of the working tree, so a running game test does not block publication. Older releases (up to `build-78`) still carry a debug-loader asset; the KeyAuth links never referenced it. Root [SpitewareSetup.bat](../../SpitewareSetup.bat) now uses the canonical `spiteware-project/SpitewareBuilds/releases/latest/download/SpitewareLoader.exe` URL. Downloads are staged beside the target, PE-validated, then replaced. Only its download fragment was tested with fake responses; full setup/system changes were not run.
 
 ### Local verification
 

@@ -17,7 +17,6 @@ BUILDS = Path(__file__).resolve().parents[1]
 ROOT = BUILDS.parents[1]
 SOURCES = {
     'SpitewareLoader.exe': 'loader/build/release/SpitewareLoader.exe',
-    'SpitewareLoader_Debug.exe': 'loader/build/debug/SpitewareLoader.exe',
     'cs2_kernel_pro.exe': 'kernel-pro/build/Spiteware/cs2_kernel_pro.exe',
     'cs2_kernel_esp.exe': 'kernel-esp/build/Spiteware/cs2_kernel_esp.exe',
     'cs2_kernel_obsidian.exe': 'kernel-obsidian/build/Spiteware/cs2_kernel_obsidian.exe',
@@ -119,7 +118,7 @@ class ArtifactTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.snapshot(), self.old)
 
-    def test_reviewed_refresh_replaces_all_five_in_a_fixture(self):
+    def test_reviewed_refresh_replaces_all_four_in_a_fixture(self):
         plan = self.run_tool('refresh', '--source-root', self.root, '--directory', self.directory)
         approved = Path(self.tmp.name) / 'review.json'
         approved.write_text(plan.stdout)

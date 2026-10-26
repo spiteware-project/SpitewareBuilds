@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate and stage the five root artifacts
+      - name: Validate and stage the four root artifacts
         run: python3 artifacts.py stage-release --output-dir dist
 
       - name: Create GitHub Release with reviewed artifacts and manifest
@@ -26,7 +26,6 @@ jobs:
           name: "Build ${{ github.run_number }}"
           files: |
             dist/SpitewareLoader.exe
-            dist/SpitewareLoader_Debug.exe
             dist/cs2_kernel_pro.exe
             dist/cs2_kernel_esp.exe
             dist/cs2_kernel_obsidian.exe
