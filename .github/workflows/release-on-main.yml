@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - main
-    # Documentation-only pushes must not publish a release with unchanged
-    # binaries. A docs commit on 27.10.2026 created build-81 this way.
-    paths-ignore:
-      - 'docs/**'
-      - 'readme.md'
-      - 'README.md'
-      - '.github/**'
+    # Only a change to the four shipped executables or the staging helper may
+    # publish. Documentation, .gitkeep and workflow edits must not create a
+    # release: the docs push on 27.10.2026 produced build-81, a structure push
+    # produced build-82, both with unchanged binaries.
+    paths:
+      - '*.exe'
+      - 'artifacts.py'
 
 jobs:
   release:
