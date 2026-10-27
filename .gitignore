@@ -17,3 +17,7 @@ final_build_pro_test.log
 final_build_esp_test2.log
 final_build_pro_test2.log
 build.log
+
+# Generated output, renders and labs stay local (see central AGENTS.md)
+/out/*
+!/out/.gitkeep
