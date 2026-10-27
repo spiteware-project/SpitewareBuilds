@@ -70,7 +70,7 @@ The [workflow](.github/workflows/release-on-main.yml) still publishes on pushes 
 
 All four pass PE checks before staging. Explicit asset paths and `fail_on_unmatched_files: true` prevent silent omissions. The release includes four executables plus `manifest.json`: `schema_version: 1`, `purpose: "release"`, and `artifacts` entries with `name`, `size`, lowercase `sha256`, and nullable `file_version`.
 
-The job uses `softprops/action-gh-release@v2`, `contents: write`, and tag `build-${{ github.run_number }}`. It does not compile sources or update KeyAuth. `build-<N>` is separate from PE and KeyAuth versions. A documentation-only push can still publish unchanged binaries. The repaired workflow was checked locally; no new GitHub run is claimed.
+The job uses `softprops/action-gh-release@v2`, `contents: write`, and tag `build-${{ github.run_number }}`. It does not compile sources or update KeyAuth. `build-<N>` is separate from PE and KeyAuth versions. Since 27.10.2026 the workflow ignores `docs/**`, `readme.md`, `README.md` and `.github/**`, so documentation-only pushes no longer publish a release. The docs push earlier that day created `build-81` with unchanged binaries; it stays published. The repaired workflow was checked locally; no new GitHub run is claimed.
 
 ### Manual publishing helper
 
