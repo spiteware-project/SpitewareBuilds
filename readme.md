@@ -32,6 +32,8 @@ workflow uploads executable files only and packages no configurations or
 
 On 09.10.2026, GitHub's latest-release endpoint returned [build-77](https://github.com/spiteware-project/SpitewareBuilds/releases/tag/build-77), published **14.08.2026 at 05:22:08 UTC**. Its [release job](https://github.com/spiteware-project/SpitewareBuilds/actions/runs/31772762549) completed successfully on 14.08.2026. These observations do not establish that later source changes have been published.
 
+**Current release (checked 26.10.2026): `build-80` = Pro `1.1.0`.** Published through `release.mjs --publish`; the shipped asset was verified by SHA256 against the approved binary `2DF51BF6A09DC2B4827C134BBA683ADAE3E7F1E76E5026C704FAEF4715FA571B`, KeyAuth `cs2_kernel_pro_version` read back as `1.1.0`, and the Supabase version override cleared. Loader (1.0.0.5), ESP and Obsidian were unchanged. `build-79` was a structure-only release (five to four artifacts, binaries unchanged). The `build-80` tag exists only on the remote; local tags stop at `build-79`. Chronology: [Chronik](docs/CHRONIK.md); open items: [Roadmap](docs/ROADMAP.md).
+
 | Artifact | Root/release bytes | Local source bytes | Root/release SHA256 prefix | Local source SHA256 prefix |
 |---|---:|---:|---|---|
 | Loader | 13,592,576 | 13,592,576 | `A97E794F` | `A97E794F` |
