@@ -28,9 +28,12 @@ und in [readme.md](../readme.md).
   noch nicht durch einen weiteren Release geprüft.
 - **Changelog veröffentlicht (31.10.2026):** Eintrag
   `a1074dae-99ed-4552-a508-1252e46600ee` (Titel „ESP 1.0.0.3“, `published=true`,
-  IndexNow an drei URLs) und Discord-Post `1566075258467786823` in
+  IndexNow an drei URLs) und Discord-Post `1566075564832465028` in
   `#announcements` als Bot „Spiteware Manager“, Texte vorher von Michael
-  freigegeben. Die „/changelog“-Seite hat `revalidate = 300`, der neue Eintrag
+  freigegeben. Der erste Post (`1566075258467786823`) wurde von Michael gelöscht,
+  weil der Bug-Reports-Kanal nur als Text darin stand; der neue Post nutzt die
+  echte Erwähnung `<#1442853146073239665>` (`#bug-reports`, `GUILD_FORUM`,
+  Kanal-ID vorher über die Discord-API geprüft). Die „/changelog“-Seite hat `revalidate = 300`, der neue Eintrag
   erscheint dort also nach spätestens fünf Minuten; die Supabase-Zeile war direkt
   nach dem Lauf nachweisbar.
 - **Offen:** Loader-Auto-Update und FPS/Bildfluss am neuen Build sind Michaels
