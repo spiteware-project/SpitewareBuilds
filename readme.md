@@ -32,14 +32,14 @@ workflow uploads executable files only and packages no configurations or
 
 On 09.10.2026, GitHub's latest-release endpoint returned [build-77](https://github.com/spiteware-project/SpitewareBuilds/releases/tag/build-77), published **14.08.2026 at 05:22:08 UTC**. Its [release job](https://github.com/spiteware-project/SpitewareBuilds/actions/runs/31772762549) completed successfully on 14.08.2026. These observations do not establish that later source changes have been published.
 
-**Current release (checked 26.10.2026): `build-80` = Pro `1.1.0`.** Published through `release.mjs --publish`; the shipped asset was verified by SHA256 against the approved binary `2DF51BF6A09DC2B4827C134BBA683ADAE3E7F1E76E5026C704FAEF4715FA571B`, KeyAuth `cs2_kernel_pro_version` read back as `1.1.0`, and the Supabase version override cleared. Loader (1.0.0.5), ESP and Obsidian were unchanged. `build-79` was a structure-only release (five to four artifacts, binaries unchanged). The `build-80` tag exists only on the remote; local tags stop at `build-79`. Chronology: [Chronik](docs/CHRONIK.md); open items: [Roadmap](docs/ROADMAP.md).
+**Current release (checked 31.10.2026): `build-83` = ESP `1.0.0.3`.** Published through `release.mjs --publish` with `--skip-build` (the game-tested `build/Spiteware` binary) and `--keep-published cs2_kernel_obsidian.exe`; the shipped asset was downloaded from `releases/latest/download/cs2_kernel_esp.exe` and hashed to `DB04D01AAFFA9CACF0B2B7129B538D1A5FAC02F43AE5FB21FDB4E5689E3A7AA6` (2,009,600 bytes, file version 1.0.0.3), KeyAuth `cs2_kernel_esp_version` read back as `1.0.0.3` and `/api/config` agreed. Loader (1.0.0.5), Pro and Obsidian were unchanged. The version-sync step of that run failed after the publish (undefined `problem()`, wrong `git add` path for the loader fallbacks); both script bugs are fixed and the loader fallback was committed as `63199e7`. Chronology: [Chronik](docs/CHRONIK.md); open items: [Roadmap](docs/ROADMAP.md).
 
 | Artifact | Root/release bytes | Local source bytes | Root/release SHA256 prefix | Local source SHA256 prefix |
 |---|---:|---:|---|---|
 | Loader | 13,592,576 | 13,592,576 | `A97E794F` | `A97E794F` |
 | Debug loader | 17,775,104 | 17,775,104 | `320C94AE` | `320C94AE` |
 | Pro | 3,076,096 | 3,076,608 | `C4F4D10E` | `D8FABAE0` |
-| ESP | 2,529,792 | 2,529,792 | `A43B18BB` | `EB0ABF90` |
+| ESP | 2,009,600 | 2,009,600 | `DB04D01A` | `DB04D01A` |
 | Obsidian | 3,082,752 | 3,082,752 | `21C423B5` | `7AD74366` |
 
 Full local hashes were compared with `Get-FileHash -Algorithm SHA256` and GitHub asset digests. Both loader sources were dated 02.06.2026; the three kernel sources were dated 13.09.2026. Root kernel artifacts and flat `mods/` copies were dated 25.06.2026. Equal size or PE version is insufficient: ESP and Obsidian have equal sizes but different hashes.

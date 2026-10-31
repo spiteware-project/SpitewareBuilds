@@ -4,6 +4,33 @@ Datierte Release- und Automatisierungsnachweise. Neueste Einträge oben.
 Der laufende Ablauf steht in [Release-Workflow](../../../docs/release-workflow.md)
 und in [readme.md](../readme.md).
 
+## 31.10.2026 · `build-83` – ESP 1.0.0.3
+
+- **Was:** ESP `1.0.0.3` (PE-Version 1.0.0.3, 2.009.600 B,
+  `DB04D01A…9E3A7AA6`), veröffentlicht mit
+  `release.mjs esp 1.0.0.3 --skip-build --keep-published cs2_kernel_obsidian.exe
+  --publish`. `--skip-build` bewusst: das veröffentlichte Binary ist genau der
+  lokale, getestete Build aus `build/Spiteware` (Commit `1c57a4f` im
+  kernel-esp-Repo), und `--keep-published` verhindert, dass der lokal geänderte
+  Obsidian-Build mitgeht.
+- **Nachweis:** Release `build-83` am 31.10.2026 12:47 UTC; Asset
+  `cs2_kernel_esp.exe` aus `releases/latest/download/` heruntergeladen, SHA256
+  gleich dem freigegebenen Binary, Dateiversion 1.0.0.3. KeyAuth
+  `cs2_kernel_esp_version = 1.0.0.3` per Read-Back, `https://www.spiteware.xyz/api/config`
+  meldet 1.0.0.3, keine `product_overrides`-Reste. Loader, Pro und Obsidian
+  unverändert.
+- **Panne im Lauf, Release davon nicht betroffen:** die Versions-Sync-Phase rief
+  ein nie definiertes `problem()` (`ReferenceError`, Ende exit 1) und übergab
+  `mods/cs2_kernel_esp.cpp` an `git add`, obwohl die Datei in
+  `SpitewareLoader/src/mods/` liegt (`pathspec` 128). Beides in
+  `platform/spiteware` `a11e953` behoben (`problem()` als Warnung, Pfad relativ
+  zum Loader-Repo); Loader-Fallback `1.0.0.3` als `63199e7` gepusht. Der Fix ist
+  noch nicht durch einen weiteren Release geprüft.
+- **Offen:** Changelog-Eintrag (Website + Discord) aus dem Briefing
+  `changelog-briefing-esp-1.0.0.3-2026-10-31T12-46-08-529Z.json` – Freigabe
+  durch Michael steht aus; Loader-Auto-Update und FPS/Bildfluss am neuen Build
+  sind Michaels Test.
+
 **Changelog-Veröffentlichung (`platform/spiteware/scripts/changelog.mjs`,
 26.10.2026):** Aus dem Briefing formuliert die KI die beiden Kundentexte und
 zeigt sie Michael; erst nach dessen Freigabe wird mit `--publish` veröffentlicht:
