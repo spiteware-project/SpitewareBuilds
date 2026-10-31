@@ -26,10 +26,16 @@ und in [readme.md](../readme.md).
   `platform/spiteware` `a11e953` behoben (`problem()` als Warnung, Pfad relativ
   zum Loader-Repo); Loader-Fallback `1.0.0.3` als `63199e7` gepusht. Der Fix ist
   noch nicht durch einen weiteren Release geprüft.
-- **Offen:** Changelog-Eintrag (Website + Discord) aus dem Briefing
-  `changelog-briefing-esp-1.0.0.3-2026-10-31T12-46-08-529Z.json` – Freigabe
-  durch Michael steht aus; Loader-Auto-Update und FPS/Bildfluss am neuen Build
-  sind Michaels Test.
+- **Changelog veröffentlicht (31.10.2026):** Eintrag
+  `a1074dae-99ed-4552-a508-1252e46600ee` (Titel „ESP 1.0.0.3“, `published=true`,
+  IndexNow an drei URLs) und Discord-Post `1566075258467786823` in
+  `#announcements` als Bot „Spiteware Manager“, Texte vorher von Michael
+  freigegeben. Die „/changelog“-Seite hat `revalidate = 300`, der neue Eintrag
+  erscheint dort also nach spätestens fünf Minuten; die Supabase-Zeile war direkt
+  nach dem Lauf nachweisbar.
+- **Offen:** Loader-Auto-Update und FPS/Bildfluss am neuen Build sind Michaels
+  Test, ebenso die Pro-Übertragung der gleichen Features (im Discord-Post mit
+  2 bis 3 Tagen und 3 Tagen Gutschrift für Pro-Nutzer angekündigt).
 
 **Changelog-Veröffentlichung (`platform/spiteware/scripts/changelog.mjs`,
 26.10.2026):** Aus dem Briefing formuliert die KI die beiden Kundentexte und
